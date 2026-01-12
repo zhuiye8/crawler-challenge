@@ -18,8 +18,8 @@ RUN npm install --omit=dev
 # Copy application files
 COPY . .
 
-# Initialize database
-RUN npm run init-db
+# Create data directory and initialize database
+RUN mkdir -p /app/data && npm run init-db
 
 # Expose port
 EXPOSE 3000
