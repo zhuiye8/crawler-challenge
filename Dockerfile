@@ -18,11 +18,15 @@ RUN npm install --omit=dev
 # Copy application files
 COPY . .
 
-# Create data directory and initialize database
-RUN mkdir -p /app/data && npm run init-db
+# Create data directory
+RUN mkdir -p /app/data
+
+# Copy and setup entrypoint script (convert CRLF to LF for Windows compatibility)
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Expose port
 EXPOSE 3000
 
-# Start application
-CMD ["npm", "start"]
+# Use entrypoint to init db at runtime (not build time)
+ENTRYPOINT ["docker-entrypoint.sh"]

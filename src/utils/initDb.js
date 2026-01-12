@@ -1,9 +1,18 @@
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 
-const dbPath = path.join(__dirname, '../../data/challenge.db');
+const dataDir = path.join(__dirname, '../../data');
+const dbPath = path.join(dataDir, 'challenge.db');
+
+// Ensure data directory exists
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+  console.log('Created data directory:', dataDir);
+}
+
 const db = new Database(dbPath);
 
 console.log('Initializing database...');
