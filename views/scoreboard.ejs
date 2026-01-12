@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scoreboard | Crawler Challenge</title>
+  <title>实时排行榜 | 爬虫挑战赛</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
       background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
       min-height: 100vh;
       color: #fff;
@@ -140,35 +140,49 @@
       height: 12px;
       border-radius: 3px;
     }
+    .back-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+    .back-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>🏆 Live Scoreboard</h1>
-    <p>Crawler Challenge - Real-time Rankings</p>
+    <h1>🏆 实时排行榜</h1>
+    <p>爬虫挑战赛 - 实时排名</p>
     <div class="live-indicator">
       <span class="live-dot"></span>
-      LIVE
+      实时更新中
     </div>
+    <br>
+    <a href="/" class="back-btn">← 返回首页</a>
   </div>
 
   <% if (leaderboard.length === 0) { %>
   <div class="empty-state">
-    <h2>No submissions yet</h2>
-    <p>Be the first to submit your scraped data!</p>
+    <h2>暂无提交记录</h2>
+    <p>成为第一个提交数据的人吧！</p>
   </div>
   <% } else { %>
   <table id="leaderboard">
     <thead>
       <tr>
-        <th style="width: 60px">Rank</th>
-        <th>Team</th>
-        <th>L1 (15)</th>
-        <th>L2 (25)</th>
-        <th>L3 (25)</th>
-        <th>L4 (35)</th>
-        <th>Total</th>
-        <th>Last Update</th>
+        <th style="width: 60px">排名</th>
+        <th>队伍</th>
+        <th>第1关 (15)</th>
+        <th>第2关 (25)</th>
+        <th>第3关 (25)</th>
+        <th>第4关 (35)</th>
+        <th>总分</th>
+        <th>最后提交</th>
       </tr>
     </thead>
     <tbody>
@@ -195,7 +209,7 @@
         <% } %>
         <td class="total-score"><%= team.total_score %></td>
         <td class="last-update">
-          <%= new Date(team.last_submission).toLocaleTimeString() %>
+          <%= new Date(team.last_submission).toLocaleTimeString('zh-CN') %>
         </td>
       </tr>
       <% }); %>
@@ -203,9 +217,9 @@
   </table>
 
   <div class="legend">
-    <span><span class="legend-dot" style="background: rgba(46, 204, 113, 0.5)"></span> Full Score</span>
-    <span><span class="legend-dot" style="background: rgba(241, 196, 15, 0.5)"></span> Partial Score</span>
-    <span><span class="legend-dot" style="background: rgba(255,255,255,0.2)"></span> Not Attempted</span>
+    <span><span class="legend-dot" style="background: rgba(46, 204, 113, 0.5)"></span> 满分</span>
+    <span><span class="legend-dot" style="background: rgba(241, 196, 15, 0.5)"></span> 部分得分</span>
+    <span><span class="legend-dot" style="background: rgba(255,255,255,0.2)"></span> 未尝试</span>
   </div>
   <% } %>
 
@@ -214,17 +228,15 @@
     const socket = io();
 
     socket.on('submission', (data) => {
-      console.log('New submission:', data);
+      console.log('新提交:', data);
 
-      // Refresh the page to show updated scores
-      // In production, update the DOM directly for smoother UX
       const row = document.getElementById('team-' + data.team_id);
       if (row) {
         row.classList.add('update-flash');
         setTimeout(() => row.classList.remove('update-flash'), 500);
       }
 
-      // Reload page after short delay to get updated rankings
+      // 刷新页面获取最新排名
       setTimeout(() => {
         window.location.reload();
       }, 1000);

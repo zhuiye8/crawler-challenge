@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Level 1 - Product Catalog | Crawler Challenge</title>
+  <title>第1关 - 商品目录 | 爬虫挑战赛</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
       background: #f5f5f5;
       padding: 20px;
     }
@@ -27,6 +27,15 @@
       border-radius: 5px;
       display: inline-block;
       margin-top: 15px;
+    }
+    .back-btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
     }
     table {
       width: 100%;
@@ -61,7 +70,7 @@
       font-size: 0.85em;
     }
 
-    /* Honeypot trap - hidden products */
+    /* 蜜罐陷阱 - 隐藏的商品 */
     .honeypot {
       display: none !important;
       visibility: hidden !important;
@@ -70,7 +79,7 @@
       left: -9999px !important;
     }
 
-    /* Another trap - white text on white */
+    /* 另一个陷阱 - 白色文字 */
     .secret-deal {
       color: #ffffff;
       background: #ffffff;
@@ -87,22 +96,24 @@
 </head>
 <body>
   <div class="header">
-    <h1>🛒 MegaShop Product Catalog</h1>
-    <p>Your one-stop shop for everything!</p>
+    <h1>🛒 超级商城 - 商品目录</h1>
+    <p>一站式购物平台！</p>
     <div class="stats">
-      Total Products: <strong><%= totalCount %></strong>
+      商品总数: <strong><%= totalCount %></strong>
     </div>
+    <br>
+    <a href="/" class="back-btn">← 返回首页</a>
   </div>
 
   <table id="product-table">
     <thead>
       <tr>
         <th>ID</th>
-        <th>Product Name</th>
-        <th>Price</th>
-        <th>Stock</th>
+        <th>商品名称</th>
+        <th>价格</th>
+        <th>库存</th>
         <th>SKU</th>
-        <th>Category</th>
+        <th>分类</th>
       </tr>
     </thead>
     <tbody>
@@ -110,62 +121,62 @@
       <tr data-id="<%= product.id %>">
         <td><%= product.id %></td>
         <td><%= product.name %></td>
-        <td class="price">$<%= product.price.toFixed(2) %></td>
+        <td class="price">¥<%= product.price.toFixed(2) %></td>
         <td class="stock <%= product.stock < 10 ? (product.stock === 0 ? 'out' : 'low') : '' %>">
-          <%= product.stock %> units
+          <%= product.stock %> 件
         </td>
         <td class="sku"><%= product.sku %></td>
         <td><span class="category"><%= product.category %></span></td>
       </tr>
       <% }); %>
 
-      <!-- HONEYPOT TRAPS - Hidden rows that bots might scrape -->
+      <!-- 蜜罐陷阱 - 隐藏的行，爬虫可能会抓取 -->
       <% honeypots.forEach(function(hp) { %>
       <tr class="honeypot" data-id="<%= hp.id %>" data-trap="true">
         <td><%= hp.id %></td>
-        <td>SPECIAL DEAL: <%= hp.name %></td>
-        <td class="price">$<%= (hp.price * 0.01).toFixed(2) %></td>
-        <td class="stock">999 units</td>
+        <td>特价商品: <%= hp.name %></td>
+        <td class="price">¥<%= (hp.price * 0.01).toFixed(2) %></td>
+        <td class="stock">999 件</td>
         <td class="sku">TRAP<%= hp.sku %></td>
-        <td><span class="category">SECRET</span></td>
+        <td><span class="category">秘密</span></td>
       </tr>
       <% }); %>
 
-      <!-- Another hidden trap using different technique -->
+      <!-- 另一个隐藏陷阱 -->
       <tr style="display:none" data-trap="invisible">
         <td>999</td>
-        <td>Ultra Secret Product XYZ</td>
-        <td>$0.01</td>
+        <td>超级秘密商品 XYZ</td>
+        <td>¥0.01</td>
         <td>∞</td>
         <td>HIDDEN123</td>
-        <td>Hidden</td>
+        <td>隐藏</td>
       </tr>
     </tbody>
   </table>
 
-  <!-- Hidden link trap -->
-  <a href="/api/trap/link1" style="display:none">Click for special deals!</a>
-  <a href="/api/trap/link2" class="honeypot">More products here</a>
+  <!-- 隐藏链接陷阱 -->
+  <a href="/api/trap/link1" style="display:none">点击获取特价商品！</a>
+  <a href="/api/trap/link2" class="honeypot">更多商品</a>
 
-  <!-- White text trap -->
+  <!-- 白色文字陷阱 -->
   <p class="secret-deal">SECRET_PRODUCT_ID:9999,PRICE:0.01,TRAP:TRUE</p>
 
   <div class="footer">
-    <p>© 2025 MegaShop - Crawler Challenge Platform</p>
-    <p>Hint: Not everything you see should be scraped...</p>
+    <p>© 2025 超级商城 - 爬虫挑战赛平台</p>
+    <p>提示：不是所有你看到的数据都应该被爬取...</p>
   </div>
 
-  <!-- HTML Comment trap -->
+  <!-- HTML 注释陷阱 -->
   <!--
-    DEBUG: Hidden product for testing
+    调试信息: 隐藏商品
     ID: 1001
-    Name: Debug Test Product
-    Price: $999999.99
-    Stock: -1
+    名称: 调试测试商品
+    价格: ¥999999.99
+    库存: -1
     SKU: DEBUG001
-    Category: Test
+    分类: 测试
 
-    If you see this in your scraped data, you're doing it wrong!
+    如果你在爬取的数据中看到这个，说明你做错了！
   -->
 </body>
 </html>

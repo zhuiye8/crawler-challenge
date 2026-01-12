@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crawler Challenge - Web Scraping CTF</title>
+  <title>爬虫挑战赛 - Web Scraping CTF</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
       background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
       min-height: 100vh;
       color: #fff;
@@ -213,9 +213,8 @@
 </head>
 <body>
   <div class="hero">
-    <h1>🕷️ Crawler Challenge</h1>
-    <p>Test your web scraping skills against progressively harder challenges.
-       Use AI coding assistants, reverse engineer APIs, and bypass anti-bot measures!</p>
+    <h1>🕷️ 爬虫挑战赛</h1>
+    <p>测试你的网页爬虫技能！挑战逐级递增的难度关卡，使用 AI 编程助手、逆向分析 API、绑过反爬虫机制！</p>
     <div class="timer-box" id="timer">
       ⏱️ 60:00
     </div>
@@ -225,50 +224,50 @@
     <div class="levels-grid">
       <a href="/level1" class="level-card">
         <div class="level-header">
-          <span class="level-number">L1</span>
-          <span class="level-points">15 pts</span>
+          <span class="level-number">第1关</span>
+          <span class="level-points">15 分</span>
         </div>
-        <h3 class="level-title">Static HTML</h3>
+        <h3 class="level-title">静态 HTML 页面</h3>
         <p class="level-desc">
-          Scrape products from a simple HTML table.
-          Watch out for hidden traps!
+          从简单的 HTML 表格中爬取商品数据。
+          小心隐藏的陷阱！
         </p>
         <div class="level-tags">
           <span class="tag">BeautifulSoup</span>
           <span class="tag">Requests</span>
-          <span class="tag">Honeypot</span>
+          <span class="tag">蜜罐陷阱</span>
         </div>
       </a>
 
       <a href="/level2" class="level-card">
         <div class="level-header">
-          <span class="level-number">L2</span>
-          <span class="level-points">25 pts</span>
+          <span class="level-number">第2关</span>
+          <span class="level-points">25 分</span>
         </div>
-        <h3 class="level-title">Pagination + AJAX</h3>
+        <h3 class="level-title">分页 + AJAX 加载</h3>
         <p class="level-desc">
-          Products across 10 pages with prices loaded via API.
-          Handle rate limiting!
+          商品分布在 10 个分页，价格通过 API 异步加载。
+          注意频率限制！
         </p>
         <div class="level-tags">
-          <span class="tag">API Reverse</span>
-          <span class="tag">Pagination</span>
-          <span class="tag">Rate Limit</span>
+          <span class="tag">API逆向</span>
+          <span class="tag">分页处理</span>
+          <span class="tag">频率限制</span>
         </div>
       </a>
 
       <a href="/level3/login" class="level-card">
         <div class="level-header">
-          <span class="level-number">L3</span>
-          <span class="level-points">25 pts</span>
+          <span class="level-number">第3关</span>
+          <span class="level-points">25 分</span>
         </div>
-        <h3 class="level-title">Login + Headers</h3>
+        <h3 class="level-title">登录 + 请求头检测</h3>
         <p class="level-desc">
-          Login required. CSRF tokens and UA detection.
-          Filter out fake data!
+          需要登录才能访问。处理 CSRF 令牌和 UA 检测。
+          过滤掉假数据！
         </p>
         <div class="level-tags">
-          <span class="tag">Session</span>
+          <span class="tag">会话管理</span>
           <span class="tag">CSRF</span>
           <span class="tag">User-Agent</span>
         </div>
@@ -276,68 +275,68 @@
 
       <a href="/level4" class="level-card">
         <div class="level-header">
-          <span class="level-number">L4</span>
-          <span class="level-points">35 pts</span>
+          <span class="level-number">第4关</span>
+          <span class="level-points">35 分</span>
         </div>
-        <h3 class="level-title">Bot Detection + CAPTCHA</h3>
+        <h3 class="level-title">机器人检测 + 验证码</h3>
         <p class="level-desc">
-          Browser fingerprinting and slider captcha.
-          Requires headless browser stealth!
+          浏览器指纹检测和滑块验证码。
+          需要使用无头浏览器的隐身模式！
         </p>
         <div class="level-tags">
           <span class="tag">Playwright</span>
-          <span class="tag">Fingerprint</span>
-          <span class="tag">Captcha</span>
+          <span class="tag">浏览器指纹</span>
+          <span class="tag">验证码</span>
         </div>
       </a>
     </div>
 
     <div class="cta-buttons">
-      <a href="/scoreboard" class="btn btn-primary">🏆 Live Scoreboard</a>
+      <a href="/scoreboard" class="btn btn-primary">🏆 实时排行榜</a>
     </div>
 
     <div class="info-section">
-      <h2>📋 Rules & Information</h2>
+      <h2>📋 规则说明</h2>
       <div class="info-grid">
         <div class="info-item">
-          <h3>⏱️ Time Limit</h3>
-          <p>60 minutes to complete all 4 levels. Rankings are based on total score and completion time.</p>
+          <h3>⏱️ 时间限制</h3>
+          <p>60 分钟内完成全部 4 个关卡。排名依据总分和完成时间。</p>
         </div>
         <div class="info-item">
-          <h3>🔧 Allowed Tools</h3>
+          <h3>🔧 允许使用的工具</h3>
           <ul>
             <li>Claude Code / Cursor / Copilot</li>
-            <li>Web search engines</li>
-            <li>Any programming language</li>
-            <li>Browser DevTools</li>
+            <li>搜索引擎</li>
+            <li>任意编程语言</li>
+            <li>浏览器开发者工具</li>
           </ul>
         </div>
         <div class="info-item">
-          <h3>⚠️ Submission Limits</h3>
-          <p>Maximum 5 submissions per level. Only your highest score counts.</p>
+          <h3>⚠️ 提交限制</h3>
+          <p>每个关卡最多提交 5 次，只计算最高分。</p>
         </div>
         <div class="info-item">
-          <h3>🎯 Scoring</h3>
+          <h3>🎯 评分标准</h3>
           <ul>
-            <li>Data completeness (30%)</li>
-            <li>Data accuracy (40%)</li>
-            <li>Honeypot avoidance (20%)</li>
-            <li>Speed bonus (10%)</li>
+            <li>数据完整性 (30%)</li>
+            <li>数据准确性 (40%)</li>
+            <li>蜜罐规避 (20%)</li>
+            <li>速度加分 (10%)</li>
           </ul>
         </div>
       </div>
 
       <div class="api-docs">
-        <h3>📡 Submission API</h3>
+        <h3>📡 提交接口</h3>
         <div class="api-endpoint">
           <span class="method">POST</span> /api/submit
         </div>
         <pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 5px; overflow-x: auto;">
 {
   "level": 1,
-  "team_id": "your_team_name",
+  "team_id": "你的队伍ID",
   "data": [
-    {"id": 1, "name": "Product 1", "price": 99.99, "stock": 50, "sku": "ABC123"},
+    {"id": 1, "name": "商品1", "price": 99.99, "stock": 50, "sku": "ABC123"},
     ...
   ]
 }</pre>
@@ -345,22 +344,22 @@
     </div>
 
     <div class="info-section">
-      <h2>🔐 Test Accounts (Level 3)</h2>
+      <h2>🔐 测试账号（第3关使用）</h2>
       <p style="color: rgba(255,255,255,0.7);">
-        Username: <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px;">team01</code> to <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px;">team20</code><br>
-        Password: <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px;">test123</code>
+        用户名: <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px;">team01</code> 至 <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px;">team20</code><br>
+        密码: <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px;">test123</code>
       </p>
     </div>
   </div>
 
   <div class="footer">
-    <p>Crawler Challenge Platform &copy; 2025</p>
-    <p>Built for testing AI-assisted web scraping skills</p>
+    <p>爬虫挑战赛平台 &copy; 2025</p>
+    <p>专为测试 AI 辅助爬虫能力而设计</p>
   </div>
 
   <script>
-    // Countdown timer (for demo - in production, sync with server)
-    let timeLeft = 60 * 60; // 60 minutes
+    // 倒计时
+    let timeLeft = 60 * 60; // 60分钟
 
     function updateTimer() {
       const minutes = Math.floor(timeLeft / 60);
@@ -372,7 +371,7 @@
         timeLeft--;
         setTimeout(updateTimer, 1000);
       } else {
-        document.getElementById('timer').textContent = '⏱️ TIME UP!';
+        document.getElementById('timer').textContent = '⏱️ 时间到！';
         document.getElementById('timer').style.color = '#e74c3c';
       }
     }

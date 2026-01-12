@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Level 3 - Order History | Crawler Challenge</title>
+  <title>第3关 - 订单历史 | 爬虫挑战赛</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
       background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
       min-height: 100vh;
       padding: 20px;
@@ -21,6 +21,8 @@
       padding: 20px 30px;
       border-radius: 15px;
       margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
     }
     .header h1 {
       font-size: 1.5em;
@@ -48,6 +50,14 @@
     }
     .logout-btn:hover {
       background: rgba(231, 76, 60, 0.5);
+    }
+    .back-btn {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      padding: 8px 15px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.9em;
     }
     .warning-box {
       background: rgba(241, 196, 15, 0.2);
@@ -109,10 +119,10 @@
     .status-processing { background: rgba(241, 196, 15, 0.2); color: #f1c40f; }
     .status-delivered { background: rgba(155, 89, 182, 0.2); color: #9b59b6; }
 
-    /* Fake order indicators - subtle but detectable */
+    /* 假订单标识 - 微妙但可检测 */
     .fake-order {
-      /* Orders with FAKE_ prefix in product name are fake */
-      /* Prices > $10000 are also fake */
+      /* 带有 FAKE_ 前缀的商品名是假的 */
+      /* 价格 > ¥10000 的也是假的 */
     }
 
     .api-hint {
@@ -132,50 +142,51 @@
 </head>
 <body>
   <div class="header">
-    <h1>📦 Your Order History</h1>
+    <h1>📦 您的订单历史</h1>
     <div class="user-info">
       <span class="user-badge">👤 <%= user.username %> | <%= user.teamName %></span>
-      <a href="/level3/logout" class="logout-btn">Logout</a>
+      <a href="/" class="back-btn">← 首页</a>
+      <a href="/level3/logout" class="logout-btn">退出登录</a>
     </div>
   </div>
 
   <% if (isBot) { %>
   <div class="warning-box">
-    ⚠️ <strong>Notice:</strong> Your request headers suggest automated access.
+    ⚠️ <strong>注意：</strong>您的请求头显示可能是自动化访问。
     User-Agent: <code><%= userAgent %></code>
   </div>
   <% } %>
 
   <% if (missingHeaders.length > 0) { %>
   <div class="warning-box">
-    ⚠️ <strong>Missing headers:</strong> <%= missingHeaders.join(', ') %>
+    ⚠️ <strong>缺少请求头：</strong><%= missingHeaders.join(', ') %>
   </div>
   <% } %>
 
   <div class="stats">
     <div class="stat-card">
       <div class="stat-value"><%= orders.length %></div>
-      <div class="stat-label">Total Orders</div>
+      <div class="stat-label">订单总数</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value">$<%= orders.reduce((sum, o) => sum + o.total_price, 0).toFixed(2) %></div>
-      <div class="stat-label">Total Spent</div>
+      <div class="stat-value">¥<%= orders.reduce((sum, o) => sum + o.total_price, 0).toFixed(2) %></div>
+      <div class="stat-label">消费总额</div>
     </div>
     <div class="stat-card">
       <div class="stat-value"><%= orders.filter(o => o.status === 'Delivered').length %></div>
-      <div class="stat-label">Delivered</div>
+      <div class="stat-label">已送达</div>
     </div>
   </div>
 
   <table>
     <thead>
       <tr>
-        <th>Order ID</th>
-        <th>Product</th>
-        <th>Qty</th>
-        <th>Total</th>
-        <th>Status</th>
-        <th>Date</th>
+        <th>订单号</th>
+        <th>商品</th>
+        <th>数量</th>
+        <th>金额</th>
+        <th>状态</th>
+        <th>日期</th>
       </tr>
     </thead>
     <tbody>
@@ -184,21 +195,25 @@
         <td>#<%= order.id %></td>
         <td><%= order.product_name %></td>
         <td><%= order.quantity %></td>
-        <td class="price">$<%= order.total_price.toFixed(2) %></td>
+        <td class="price">¥<%= order.total_price.toFixed(2) %></td>
         <td>
           <span class="status status-<%= order.status.toLowerCase() %>">
-            <%= order.status %>
+            <% if (order.status === 'Completed') { %>已完成
+            <% } else if (order.status === 'Shipped') { %>已发货
+            <% } else if (order.status === 'Processing') { %>处理中
+            <% } else if (order.status === 'Delivered') { %>已送达
+            <% } else { %><%= order.status %><% } %>
           </span>
         </td>
-        <td><%= new Date(order.order_date).toLocaleDateString() %></td>
+        <td><%= new Date(order.order_date).toLocaleDateString('zh-CN') %></td>
       </tr>
       <% }); %>
     </tbody>
   </table>
 
   <div class="api-hint">
-    <strong>💡 Alternative:</strong> You can also fetch orders via API: <code>GET /level3/api/orders</code><br>
-    <strong>🔍 Hint:</strong> Real products don't have prices over $10,000...
+    <strong>💡 替代方案：</strong>也可以通过 API 获取订单: <code>GET /level3/api/orders</code><br>
+    <strong>🔍 提示：</strong>真实商品的价格不会超过 ¥10,000...
   </div>
 </body>
 </html>

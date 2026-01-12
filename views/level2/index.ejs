@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Level 2 - Dynamic Catalog | Crawler Challenge</title>
+  <title>第2关 - 动态商城 | 爬虫挑战赛</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
       min-height: 100vh;
       padding: 20px;
@@ -28,6 +28,15 @@
       background: linear-gradient(90deg, #00d2ff, #3a7bd5);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+    }
+    .back-btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
     }
     .product-grid {
       display: grid;
@@ -118,7 +127,7 @@
       font-family: monospace;
     }
 
-    /* Hidden honeypot link */
+    /* 隐藏的蜜罐链接 */
     .special-offers {
       position: absolute;
       left: -9999px;
@@ -128,17 +137,18 @@
 </head>
 <body>
   <div class="header">
-    <h1>⚡ TechMart Dynamic Store</h1>
-    <p>Page <%= currentPage %> of <%= totalPages %> | <%= itemsPerPage %> items per page</p>
+    <h1>⚡ 科技商城 - 动态加载</h1>
+    <p>第 <%= currentPage %> 页，共 <%= totalPages %> 页 | 每页 <%= itemsPerPage %> 件商品</p>
+    <a href="/" class="back-btn">← 返回首页</a>
   </div>
 
   <div class="product-grid">
     <% products.forEach(function(product) { %>
     <div class="product-card" data-id="<%= product.id %>">
       <div class="product-name"><%= product.name %></div>
-      <div class="product-price loading" id="price-<%= product.id %>">Loading</div>
+      <div class="product-price loading" id="price-<%= product.id %>">加载中</div>
       <div class="product-meta">
-        <span>📦 Stock: <%= product.stock %></span>
+        <span>📦 库存: <%= product.stock %></span>
         <span>🏷️ SKU: <%= product.sku %></span>
       </div>
       <div class="product-meta">
@@ -150,11 +160,11 @@
 
   <div class="pagination">
     <% if (currentPage > 1) { %>
-      <a href="?page=1">« First</a>
-      <a href="?page=<%= currentPage - 1 %>">‹ Prev</a>
+      <a href="?page=1">« 首页</a>
+      <a href="?page=<%= currentPage - 1 %>">‹ 上一页</a>
     <% } else { %>
-      <span class="disabled">« First</span>
-      <span class="disabled">‹ Prev</span>
+      <span class="disabled">« 首页</span>
+      <span class="disabled">‹ 上一页</span>
     <% } %>
 
     <% for (let i = 1; i <= totalPages; i++) { %>
@@ -166,37 +176,37 @@
     <% } %>
 
     <% if (currentPage < totalPages) { %>
-      <a href="?page=<%= currentPage + 1 %>">Next ›</a>
-      <a href="?page=<%= totalPages %>">Last »</a>
+      <a href="?page=<%= currentPage + 1 %>">下一页 ›</a>
+      <a href="?page=<%= totalPages %>">末页 »</a>
     <% } else { %>
-      <span class="disabled">Next ›</span>
-      <span class="disabled">Last »</span>
+      <span class="disabled">下一页 ›</span>
+      <span class="disabled">末页 »</span>
     <% } %>
   </div>
 
-  <!-- Honeypot link -->
-  <a href="/level2/api/all-prices" class="special-offers">Get All Prices (Admin Only)</a>
+  <!-- 蜜罐链接 -->
+  <a href="/level2/api/all-prices" class="special-offers">获取所有价格（仅管理员）</a>
 
   <div class="api-info">
-    <h3>📡 API Information</h3>
-    <p>Prices are loaded dynamically via: <code>GET /level2/api/prices?ids=1,2,3</code></p>
-    <p>Rate limit: <code>10 requests/second</code></p>
-    <p>Max IDs per request: <code>20</code></p>
+    <h3>📡 接口信息</h3>
+    <p>价格通过以下接口动态加载: <code>GET /level2/api/prices?ids=1,2,3</code></p>
+    <p>频率限制: <code>每秒 10 次请求</code></p>
+    <p>每次最多查询: <code>20 个商品ID</code></p>
   </div>
 
   <script>
-    // Load prices via AJAX
+    // 通过 AJAX 加载价格
     document.addEventListener('DOMContentLoaded', function() {
       const productCards = document.querySelectorAll('.product-card');
       const ids = Array.from(productCards).map(card => card.dataset.id);
 
       if (ids.length === 0) return;
 
-      // Fetch prices
+      // 获取价格
       fetch('/level2/api/prices?ids=' + ids.join(','))
         .then(response => {
           if (!response.ok) {
-            throw new Error('Rate limited or error');
+            throw new Error('频率限制或错误');
           }
           return response.json();
         })
@@ -204,15 +214,15 @@
           Object.entries(data.prices).forEach(([id, price]) => {
             const priceEl = document.getElementById('price-' + id);
             if (priceEl) {
-              priceEl.textContent = '$' + price.toFixed(2);
+              priceEl.textContent = '¥' + price.toFixed(2);
               priceEl.classList.remove('loading');
             }
           });
         })
         .catch(error => {
-          console.error('Failed to load prices:', error);
+          console.error('加载价格失败:', error);
           document.querySelectorAll('.product-price.loading').forEach(el => {
-            el.textContent = 'Price unavailable';
+            el.textContent = '价格暂不可用';
           });
         });
     });

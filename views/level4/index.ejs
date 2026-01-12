@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Level 4 - VIP Flash Sale | Crawler Challenge</title>
+  <title>第4关 - VIP限时抢购 | 爬虫挑战赛</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
       min-height: 100vh;
       color: #fff;
@@ -22,13 +22,22 @@
       font-size: 1.2em;
       margin-top: 10px;
     }
+    .back-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+    }
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
     }
 
-    /* Captcha Modal */
+    /* 验证码弹窗 */
     .captcha-overlay {
       position: fixed;
       top: 0;
@@ -124,7 +133,7 @@
     }
     .hidden { display: none !important; }
 
-    /* Products Grid */
+    /* 商品网格 */
     .products-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -199,14 +208,15 @@
 </head>
 <body>
   <div class="header">
-    <h1>🔥 VIP Flash Sale</h1>
-    <div class="countdown">Limited Time Offer - Exclusive Deals!</div>
+    <h1>🔥 VIP 限时抢购</h1>
+    <div class="countdown">限时特惠 - 独家优惠！</div>
+    <a href="/" class="back-btn">← 返回首页</a>
   </div>
 
-  <!-- Captcha Overlay -->
+  <!-- 验证码弹窗 -->
   <div class="captcha-overlay" id="captchaOverlay">
     <div class="captcha-modal">
-      <div class="captcha-title">🔒 Verify You're Human</div>
+      <div class="captcha-title">🔒 请验证您是人类</div>
       <div class="captcha-image" id="captchaImage">
         <div class="captcha-target" id="captchaTarget"></div>
         <div class="captcha-puzzle" id="captchaPuzzle">🧩</div>
@@ -214,39 +224,39 @@
       <div class="slider-track" id="sliderTrack">
         <div class="slider-thumb" id="sliderThumb">→</div>
       </div>
-      <div class="slider-hint">Drag the slider to complete the puzzle</div>
+      <div class="slider-hint">拖动滑块完成拼图验证</div>
       <div class="captcha-error hidden" id="captchaError"></div>
-      <div class="captcha-success hidden" id="captchaSuccess">✓ Verified!</div>
+      <div class="captcha-success hidden" id="captchaSuccess">✓ 验证成功！</div>
     </div>
   </div>
 
   <div class="container">
     <div class="bot-warning hidden" id="botWarning">
-      ⚠️ Bot detected! Your browser fingerprint score: <span id="botScore"></span>
+      ⚠️ 检测到机器人！您的浏览器指纹评分: <span id="botScore"></span>
     </div>
 
     <div class="loading" id="loadingMessage">
-      Verifying browser... Please complete the captcha.
+      正在验证浏览器... 请完成验证码。
     </div>
 
     <div class="products-grid hidden" id="productsGrid">
-      <!-- Products will be loaded here -->
+      <!-- 商品将在这里加载 -->
     </div>
 
     <div class="debug-info hidden" id="debugInfo">
-      <strong>Debug Info:</strong><br>
-      Captcha ID: <span id="debugCaptchaId"></span><br>
-      Access Token: <span id="debugToken"></span><br>
-      Signature Key: <code>md5(productId + timestamp + SECRET_KEY)</code>
+      <strong>调试信息：</strong><br>
+      验证码 ID: <span id="debugCaptchaId"></span><br>
+      访问令牌: <span id="debugToken"></span><br>
+      签名算法: <code>md5(productId + timestamp + SECRET_KEY)</code>
     </div>
   </div>
 
   <script>
-    // ===== OBFUSCATED SECRET (考生需要逆向获取) =====
+    // ===== 混淆的密钥（考生需要逆向获取）=====
     const _0x4f23 = ['cr4wl3r', '_ch4ll3ng3', '_2025'];
     const SECRET_KEY = _0x4f23.join('');
 
-    // ===== CAPTCHA LOGIC =====
+    // ===== 验证码逻辑 =====
     const captchaId = '<%= captchaId %>';
     const targetX = <%= captchaTarget %>;
     let accessToken = null;
@@ -255,10 +265,10 @@
     let startX = 0;
     let currentX = 0;
 
-    // Set target position
+    // 设置目标位置
     document.getElementById('captchaTarget').style.left = targetX + 'px';
 
-    // Slider drag handling
+    // 滑块拖动处理
     const sliderThumb = document.getElementById('sliderThumb');
     const sliderTrack = document.getElementById('sliderTrack');
     const captchaPuzzle = document.getElementById('captchaPuzzle');
@@ -285,7 +295,7 @@
       sliderThumb.style.left = deltaX + 'px';
       captchaPuzzle.style.left = (10 + deltaX) + 'px';
 
-      // Record trajectory with Y variation
+      // 记录轨迹（包含 Y 轴变化）
       const rect = sliderTrack.getBoundingClientRect();
       const relativeY = clientY - rect.top - 25;
       track.push({
@@ -300,7 +310,7 @@
       isDragging = false;
       sliderThumb.style.cursor = 'grab';
 
-      // Verify captcha
+      // 验证
       verifyCaptcha();
     }
 
@@ -334,7 +344,7 @@
           document.getElementById('captchaError').textContent = result.error;
           document.getElementById('captchaError').classList.remove('hidden');
 
-          // Reset slider
+          // 重置滑块
           setTimeout(() => {
             sliderThumb.style.left = '0';
             captchaPuzzle.style.left = '10px';
@@ -343,11 +353,11 @@
           }, 1000);
         }
       } catch (error) {
-        console.error('Captcha verification failed:', error);
+        console.error('验证失败:', error);
       }
     }
 
-    // ===== BROWSER FINGERPRINT CHECK =====
+    // ===== 浏览器指纹检测 =====
     async function checkFingerprint() {
       const fingerprint = {
         webdriver: navigator.webdriver,
@@ -376,14 +386,14 @@
 
         return result;
       } catch (error) {
-        console.error('Fingerprint check failed:', error);
+        console.error('指纹检测失败:', error);
         return { isBot: false };
       }
     }
 
-    // ===== LOAD PRODUCTS =====
+    // ===== 加载商品 =====
     async function loadProducts() {
-      document.getElementById('loadingMessage').textContent = 'Loading exclusive deals...';
+      document.getElementById('loadingMessage').textContent = '正在加载独家优惠...';
 
       try {
         const url = `/level4/api/products?captchaId=${captchaId}&token=${accessToken}`;
@@ -391,7 +401,7 @@
         const data = await response.json();
 
         if (data.error) {
-          document.getElementById('loadingMessage').textContent = 'Error: ' + data.error;
+          document.getElementById('loadingMessage').textContent = '错误: ' + data.error;
           return;
         }
 
@@ -399,43 +409,42 @@
         document.getElementById('productsGrid').classList.remove('hidden');
         document.getElementById('debugInfo').classList.remove('hidden');
 
-        // Update debug info
+        // 更新调试信息
         document.getElementById('debugCaptchaId').textContent = captchaId;
         document.getElementById('debugToken').textContent = accessToken;
 
-        // Render products
+        // 渲染商品
         const grid = document.getElementById('productsGrid');
         grid.innerHTML = data.products.map(p => `
           <div class="product-card" data-id="${p.id}" data-secret="${generateSign(p.id)}">
             <div class="product-name">${p.name}</div>
             <div class="price-container">
-              <span class="original-price">$${p.original_price.toFixed(2)}</span>
-              <span class="sale-price">$${p.sale_price.toFixed(2)}</span>
+              <span class="original-price">¥${p.original_price.toFixed(2)}</span>
+              <span class="sale-price">¥${p.sale_price.toFixed(2)}</span>
               <span class="discount-badge">-${p.discount_percent}%</span>
             </div>
             <div class="stock-info ${p.stock < 10 ? 'low' : ''}">
-              📦 ${p.stock} units left
+              📦 剩余 ${p.stock} 件
             </div>
             <div class="timer">
-              ⏰ Ends: ${new Date(p.flash_sale_end).toLocaleTimeString()}
+              ⏰ 截止: ${new Date(p.flash_sale_end).toLocaleTimeString('zh-CN')}
             </div>
           </div>
         `).join('');
 
       } catch (error) {
-        console.error('Failed to load products:', error);
-        document.getElementById('loadingMessage').textContent = 'Failed to load products.';
+        console.error('加载商品失败:', error);
+        document.getElementById('loadingMessage').textContent = '加载商品失败。';
       }
     }
 
-    // ===== SIGNATURE GENERATION (考生需要逆向这个函数) =====
+    // ===== 签名生成（考生需要逆向这个函数）=====
     function generateSign(productId) {
       const timestamp = Date.now();
-      // This uses the obfuscated SECRET_KEY
       return md5(productId + timestamp + SECRET_KEY);
     }
 
-    // Simple MD5 implementation (for signing)
+    // 简单的 MD5 实现（用于签名）
     function md5(string) {
       function rotateLeft(x, n) { return (x << n) | (x >>> (32 - n)); }
       function addUnsigned(x, y) {
@@ -501,7 +510,7 @@
       return wordToHex(a) + wordToHex(b) + wordToHex(c) + wordToHex(d);
     }
 
-    // Initialize
+    // 初始化
     checkFingerprint();
   </script>
 </body>
