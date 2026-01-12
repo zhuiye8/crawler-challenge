@@ -48,25 +48,27 @@ function validateTrajectory(track, targetX) {
   const lastPoint = track[track.length - 1];
   const endX = lastPoint.x;
 
-  // Check if reached target (±5px tolerance)
-  if (Math.abs(endX - targetX) > 5) {
+  // The puzzle piece starts at 10px, so to reach targetX position,
+  // the slider needs to move (targetX - 10) pixels
+  const requiredMovement = targetX - 10;
+
+  // Check if reached target (±8px tolerance for better UX)
+  if (Math.abs(endX - requiredMovement) > 8) {
     return { valid: false, reason: 'Did not reach target' };
   }
 
-  // Check for Y-axis variation (human tremor)
-  const yValues = track.map(p => p.y);
-  const yVariation = Math.max(...yValues) - Math.min(...yValues);
-  if (yVariation < 1) {
-    return { valid: false, reason: 'No Y-axis variation (too robotic)' };
-  }
-
-  // Check total time (not instant)
+  // Check total time (not instant) - must take at least 150ms
   const totalTime = track[track.length - 1].t - track[0].t;
-  if (totalTime < 200) {
+  if (totalTime < 150) {
     return { valid: false, reason: 'Too fast (instant movement)' };
   }
 
-  // Check for acceleration pattern (human-like)
+  // For real humans, we do lighter checks:
+  // 1. Check for some Y-axis variation OR time variation (humans can't be perfectly precise)
+  const yValues = track.map(p => p.y);
+  const yVariation = Math.max(...yValues) - Math.min(...yValues);
+
+  // 2. Check speed isn't perfectly uniform
   const speeds = [];
   for (let i = 1; i < track.length; i++) {
     const dx = track[i].x - track[i-1].x;
@@ -74,15 +76,18 @@ function validateTrajectory(track, targetX) {
     if (dt > 0) speeds.push(dx / dt);
   }
 
-  // Humans typically accelerate then decelerate
-  const midpoint = Math.floor(speeds.length / 2);
-  const firstHalfAvg = speeds.slice(0, midpoint).reduce((a,b) => a+b, 0) / midpoint || 0;
-  const secondHalfAvg = speeds.slice(midpoint).reduce((a,b) => a+b, 0) / (speeds.length - midpoint) || 0;
+  // Calculate speed variance
+  const avgSpeed = speeds.length > 0 ? speeds.reduce((a,b) => a+b, 0) / speeds.length : 0;
+  const speedVariance = speeds.length > 0
+    ? speeds.reduce((sum, s) => sum + Math.pow(s - avgSpeed, 2), 0) / speeds.length
+    : 0;
 
-  // Allow some tolerance - just check it's not perfectly uniform
-  const speedVariance = speeds.reduce((sum, s) => sum + Math.pow(s - (speeds.reduce((a,b)=>a+b,0)/speeds.length), 2), 0) / speeds.length;
-  if (speedVariance < 0.001) {
-    return { valid: false, reason: 'Uniform speed (robotic)' };
+  // Must have EITHER Y variation OR speed variation (humans have at least one)
+  const hasYVariation = yVariation >= 0.5;
+  const hasSpeedVariation = speedVariance > 0.0001;
+
+  if (!hasYVariation && !hasSpeedVariation) {
+    return { valid: false, reason: 'Movement too uniform (robotic)' };
   }
 
   return { valid: true, reason: 'OK' };
