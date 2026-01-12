@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scoreboard | Crawler Challenge</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      min-height: 100vh;
+      color: #fff;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      font-size: 2.5em;
+      background: linear-gradient(90deg, #f5af19, #f12711);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    .header p { color: rgba(255,255,255,0.7); }
+    .live-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(46, 204, 113, 0.2);
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      color: #2ecc71;
+      margin-top: 15px;
+    }
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      background: #2ecc71;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    table {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background: rgba(255,255,255,0.05);
+      border-radius: 15px;
+      overflow: hidden;
+    }
+    th {
+      background: rgba(102, 126, 234, 0.3);
+      padding: 15px;
+      text-align: center;
+      font-weight: 600;
+    }
+    td {
+      padding: 15px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    tr:hover { background: rgba(255,255,255,0.05); }
+    .rank {
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    .rank-1 { color: #f5af19; }
+    .rank-2 { color: #bdc3c7; }
+    .rank-3 { color: #cd7f32; }
+    .team-name {
+      font-weight: 600;
+      text-align: left;
+      padding-left: 20px;
+    }
+    .total-score {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #2ecc71;
+    }
+    .level-score {
+      display: inline-block;
+      min-width: 40px;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.9em;
+    }
+    .level-complete {
+      background: rgba(46, 204, 113, 0.2);
+      color: #2ecc71;
+    }
+    .level-partial {
+      background: rgba(241, 196, 15, 0.2);
+      color: #f1c40f;
+    }
+    .level-none {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.3);
+    }
+    .last-update {
+      font-size: 0.85em;
+      color: rgba(255,255,255,0.5);
+    }
+    .empty-state {
+      text-align: center;
+      padding: 50px;
+      color: rgba(255,255,255,0.5);
+    }
+    .update-flash {
+      animation: flash 0.5s ease-out;
+    }
+    @keyframes flash {
+      0% { background: rgba(46, 204, 113, 0.3); }
+      100% { background: transparent; }
+    }
+    .legend {
+      max-width: 1000px;
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      font-size: 0.9em;
+      color: rgba(255,255,255,0.6);
+    }
+    .legend span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🏆 Live Scoreboard</h1>
+    <p>Crawler Challenge - Real-time Rankings</p>
+    <div class="live-indicator">
+      <span class="live-dot"></span>
+      LIVE
+    </div>
+  </div>
+
+  <% if (leaderboard.length === 0) { %>
+  <div class="empty-state">
+    <h2>No submissions yet</h2>
+    <p>Be the first to submit your scraped data!</p>
+  </div>
+  <% } else { %>
+  <table id="leaderboard">
+    <thead>
+      <tr>
+        <th style="width: 60px">Rank</th>
+        <th>Team</th>
+        <th>L1 (15)</th>
+        <th>L2 (25)</th>
+        <th>L3 (25)</th>
+        <th>L4 (35)</th>
+        <th>Total</th>
+        <th>Last Update</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% leaderboard.forEach(function(team, index) { %>
+      <tr id="team-<%= team.team_id %>">
+        <td class="rank rank-<%= index + 1 %>">
+          <% if (index === 0) { %>🥇
+          <% } else if (index === 1) { %>🥈
+          <% } else if (index === 2) { %>🥉
+          <% } else { %><%= index + 1 %><% } %>
+        </td>
+        <td class="team-name"><%= team.team_id %></td>
+        <% for (let level = 1; level <= 4; level++) {
+          const score = detailedScores[team.team_id][level] || 0;
+          const maxScores = {1: 15, 2: 25, 3: 25, 4: 35};
+          const maxScore = maxScores[level];
+          let className = 'level-none';
+          if (score === maxScore) className = 'level-complete';
+          else if (score > 0) className = 'level-partial';
+        %>
+        <td>
+          <span class="level-score <%= className %>"><%= score %></span>
+        </td>
+        <% } %>
+        <td class="total-score"><%= team.total_score %></td>
+        <td class="last-update">
+          <%= new Date(team.last_submission).toLocaleTimeString() %>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+
+  <div class="legend">
+    <span><span class="legend-dot" style="background: rgba(46, 204, 113, 0.5)"></span> Full Score</span>
+    <span><span class="legend-dot" style="background: rgba(241, 196, 15, 0.5)"></span> Partial Score</span>
+    <span><span class="legend-dot" style="background: rgba(255,255,255,0.2)"></span> Not Attempted</span>
+  </div>
+  <% } %>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    socket.on('submission', (data) => {
+      console.log('New submission:', data);
+
+      // Refresh the page to show updated scores
+      // In production, update the DOM directly for smoother UX
+      const row = document.getElementById('team-' + data.team_id);
+      if (row) {
+        row.classList.add('update-flash');
+        setTimeout(() => row.classList.remove('update-flash'), 500);
+      }
+
+      // Reload page after short delay to get updated rankings
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

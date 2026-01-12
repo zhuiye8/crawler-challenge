@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Level 3 - Order History | Crawler Challenge</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #fff;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.1);
+      padding: 20px 30px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 1.5em;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .user-badge {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.9em;
+    }
+    .logout-btn {
+      background: rgba(231, 76, 60, 0.3);
+      border: 1px solid rgba(231, 76, 60, 0.5);
+      color: #e74c3c;
+      padding: 8px 15px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.9em;
+      transition: background 0.3s;
+    }
+    .logout-btn:hover {
+      background: rgba(231, 76, 60, 0.5);
+    }
+    .warning-box {
+      background: rgba(241, 196, 15, 0.2);
+      border: 1px solid rgba(241, 196, 15, 0.5);
+      color: #f1c40f;
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2em;
+      font-weight: bold;
+      color: #667eea;
+    }
+    .stat-label {
+      font-size: 0.9em;
+      color: rgba(255,255,255,0.7);
+      margin-top: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th {
+      background: rgba(102, 126, 234, 0.3);
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: rgba(255,255,255,0.05); }
+    .price { color: #2ecc71; font-weight: bold; }
+    .status {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.85em;
+    }
+    .status-completed { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+    .status-shipped { background: rgba(52, 152, 219, 0.2); color: #3498db; }
+    .status-processing { background: rgba(241, 196, 15, 0.2); color: #f1c40f; }
+    .status-delivered { background: rgba(155, 89, 182, 0.2); color: #9b59b6; }
+
+    /* Fake order indicators - subtle but detectable */
+    .fake-order {
+      /* Orders with FAKE_ prefix in product name are fake */
+      /* Prices > $10000 are also fake */
+    }
+
+    .api-hint {
+      background: rgba(255,255,255,0.05);
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: rgba(255,255,255,0.6);
+    }
+    .api-hint code {
+      background: rgba(0,0,0,0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📦 Your Order History</h1>
+    <div class="user-info">
+      <span class="user-badge">👤 <%= user.username %> | <%= user.teamName %></span>
+      <a href="/level3/logout" class="logout-btn">Logout</a>
+    </div>
+  </div>
+
+  <% if (isBot) { %>
+  <div class="warning-box">
+    ⚠️ <strong>Notice:</strong> Your request headers suggest automated access.
+    User-Agent: <code><%= userAgent %></code>
+  </div>
+  <% } %>
+
+  <% if (missingHeaders.length > 0) { %>
+  <div class="warning-box">
+    ⚠️ <strong>Missing headers:</strong> <%= missingHeaders.join(', ') %>
+  </div>
+  <% } %>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-value"><%= orders.length %></div>
+      <div class="stat-label">Total Orders</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">$<%= orders.reduce((sum, o) => sum + o.total_price, 0).toFixed(2) %></div>
+      <div class="stat-label">Total Spent</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= orders.filter(o => o.status === 'Delivered').length %></div>
+      <div class="stat-label">Delivered</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Product</th>
+        <th>Qty</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% orders.forEach(function(order) { %>
+      <tr class="<%= order.is_fake ? 'fake-order' : '' %>" data-order-id="<%= order.id %>">
+        <td>#<%= order.id %></td>
+        <td><%= order.product_name %></td>
+        <td><%= order.quantity %></td>
+        <td class="price">$<%= order.total_price.toFixed(2) %></td>
+        <td>
+          <span class="status status-<%= order.status.toLowerCase() %>">
+            <%= order.status %>
+          </span>
+        </td>
+        <td><%= new Date(order.order_date).toLocaleDateString() %></td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+
+  <div class="api-hint">
+    <strong>💡 Alternative:</strong> You can also fetch orders via API: <code>GET /level3/api/orders</code><br>
+    <strong>🔍 Hint:</strong> Real products don't have prices over $10,000...
+  </div>
+</body>
+</html>

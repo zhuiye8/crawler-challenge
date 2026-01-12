@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Level 1 - Product Catalog | Crawler Challenge</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .header h1 { font-size: 2em; margin-bottom: 10px; }
+    .header p { opacity: 0.9; }
+    .stats {
+      background: rgba(255,255,255,0.2);
+      padding: 10px 20px;
+      border-radius: 5px;
+      display: inline-block;
+      margin-top: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th {
+      background: #667eea;
+      color: white;
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+    }
+    tr:hover { background: #f8f9ff; }
+    tr:last-child td { border-bottom: none; }
+    .price { color: #e74c3c; font-weight: bold; }
+    .stock { color: #27ae60; }
+    .stock.low { color: #f39c12; }
+    .stock.out { color: #e74c3c; }
+    .sku { font-family: monospace; color: #7f8c8d; font-size: 0.9em; }
+    .category {
+      background: #ecf0f1;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 0.85em;
+    }
+
+    /* Honeypot trap - hidden products */
+    .honeypot {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      position: absolute !important;
+      left: -9999px !important;
+    }
+
+    /* Another trap - white text on white */
+    .secret-deal {
+      color: #ffffff;
+      background: #ffffff;
+      font-size: 1px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #7f8c8d;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🛒 MegaShop Product Catalog</h1>
+    <p>Your one-stop shop for everything!</p>
+    <div class="stats">
+      Total Products: <strong><%= totalCount %></strong>
+    </div>
+  </div>
+
+  <table id="product-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Product Name</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>SKU</th>
+        <th>Category</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% products.forEach(function(product) { %>
+      <tr data-id="<%= product.id %>">
+        <td><%= product.id %></td>
+        <td><%= product.name %></td>
+        <td class="price">$<%= product.price.toFixed(2) %></td>
+        <td class="stock <%= product.stock < 10 ? (product.stock === 0 ? 'out' : 'low') : '' %>">
+          <%= product.stock %> units
+        </td>
+        <td class="sku"><%= product.sku %></td>
+        <td><span class="category"><%= product.category %></span></td>
+      </tr>
+      <% }); %>
+
+      <!-- HONEYPOT TRAPS - Hidden rows that bots might scrape -->
+      <% honeypots.forEach(function(hp) { %>
+      <tr class="honeypot" data-id="<%= hp.id %>" data-trap="true">
+        <td><%= hp.id %></td>
+        <td>SPECIAL DEAL: <%= hp.name %></td>
+        <td class="price">$<%= (hp.price * 0.01).toFixed(2) %></td>
+        <td class="stock">999 units</td>
+        <td class="sku">TRAP<%= hp.sku %></td>
+        <td><span class="category">SECRET</span></td>
+      </tr>
+      <% }); %>
+
+      <!-- Another hidden trap using different technique -->
+      <tr style="display:none" data-trap="invisible">
+        <td>999</td>
+        <td>Ultra Secret Product XYZ</td>
+        <td>$0.01</td>
+        <td>∞</td>
+        <td>HIDDEN123</td>
+        <td>Hidden</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Hidden link trap -->
+  <a href="/api/trap/link1" style="display:none">Click for special deals!</a>
+  <a href="/api/trap/link2" class="honeypot">More products here</a>
+
+  <!-- White text trap -->
+  <p class="secret-deal">SECRET_PRODUCT_ID:9999,PRICE:0.01,TRAP:TRUE</p>
+
+  <div class="footer">
+    <p>© 2025 MegaShop - Crawler Challenge Platform</p>
+    <p>Hint: Not everything you see should be scraped...</p>
+  </div>
+
+  <!-- HTML Comment trap -->
+  <!--
+    DEBUG: Hidden product for testing
+    ID: 1001
+    Name: Debug Test Product
+    Price: $999999.99
+    Stock: -1
+    SKU: DEBUG001
+    Category: Test
+
+    If you see this in your scraped data, you're doing it wrong!
+  -->
+</body>
+</html>
