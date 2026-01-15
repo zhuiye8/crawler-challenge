@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../utils/db');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 /**
  * Submission and Scoring API
@@ -80,6 +81,58 @@ router.post('/register', (req, res) => {
       success: false,
       error: '生成唯一ID失败，请重试'
     });
+  }
+
+  // Create user account for Level 3
+  const passwordHash = bcrypt.hashSync('test123', 10);
+  try {
+    db.prepare('INSERT INTO users (username, password_hash, team_name) VALUES (?, ?, ?)').run(task_id, passwordHash, name);
+
+    // Get user_id
+    const user = db.prepare('SELECT id FROM users WHERE username = ?').get(task_id);
+
+    // Generate sample orders for this user
+    if (user) {
+      const productNames = [
+        'Laptop Pro', 'Wireless Mouse', 'Keyboard Deluxe', 'Monitor 4K',
+        'USB Cable', 'Phone Charger', 'Headphones', 'Webcam HD'
+      ];
+      const statuses = ['Completed', 'Shipped', 'Processing', 'Delivered'];
+
+      const insertOrder = db.prepare(`
+        INSERT INTO orders (user_id, product_name, quantity, total_price, status, order_date, is_fake)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `);
+
+      // Generate 5-8 real orders
+      const numOrders = 5 + Math.floor(Math.random() * 4);
+      for (let i = 0; i < numOrders; i++) {
+        const productName = productNames[Math.floor(Math.random() * productNames.length)];
+        const quantity = 1 + Math.floor(Math.random() * 3);
+        const totalPrice = parseFloat((50 + Math.random() * 500).toFixed(2));
+        const status = statuses[Math.floor(Math.random() * statuses.length)];
+        const daysAgo = Math.floor(Math.random() * 30);
+        const orderDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
+
+        insertOrder.run(user.id, productName, quantity, totalPrice, status, orderDate, 0);
+      }
+
+      // Add 2-3 fake orders as traps
+      const numFakeOrders = 2 + Math.floor(Math.random() * 2);
+      for (let i = 0; i < numFakeOrders; i++) {
+        const productName = 'FAKE_' + productNames[Math.floor(Math.random() * productNames.length)];
+        const quantity = 1;
+        const totalPrice = 99999.99;  // Obviously fake price
+        const status = 'Cancelled';
+        const daysAgo = Math.floor(Math.random() * 30);
+        const orderDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
+
+        insertOrder.run(user.id, productName, quantity, totalPrice, status, orderDate, 1);
+      }
+    }
+  } catch (e) {
+    console.error('Error creating user account:', e);
+    // Continue even if user creation fails (for backward compatibility)
   }
 
   // Get the registered record

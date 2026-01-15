@@ -342,8 +342,16 @@
 
     <div class="info-section">
       <h2>📝 参赛者注册</h2>
+
+      <!-- 重要提示 -->
+      <div style="background: rgba(241, 196, 15, 0.15); border: 2px solid #f1c40f; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
+        <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 0.95em;">
+          ⚠️ <strong style="color: #f39c12;">重要：</strong>Level 3（登录+反爬虫）需要使用你的考试ID登录，请务必先完成注册！
+        </p>
+      </div>
+
       <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">
-        注册后将获得唯一的考试ID，用于提交答案。第3关的用户名和密码将与你的考试ID相同。
+        注册后将获得唯一的考试ID，用于提交答案。<strong style="color: #f1c40f;">完成 Level 3 时，用户名为你的考试ID，密码为 test123</strong>
       </p>
       <div style="max-width: 500px; margin: 0 auto;">
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
@@ -415,14 +423,21 @@
               姓名: <strong>${data.name}</strong><br>
               考试ID: <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px; font-family: monospace;">${data.task_id}</code><br>
               <small style="color: rgba(255,255,255,0.6);">请保存你的考试ID，用于提交答案</small><br>
-              <small style="color: rgba(255,255,255,0.6);">第3关登录时，用户名和密码均为你的考试ID</small>
+              <div style="background: rgba(52, 152, 219, 0.2); padding: 10px; border-radius: 5px; margin-top: 10px;">
+                <small style="color: rgba(255,255,255,0.8);">💡 完成 Level 3 时：</small><br>
+                <small style="color: rgba(255,255,255,0.8);">• 用户名：<code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; font-family: monospace;">${data.task_id}</code></small><br>
+                <small style="color: rgba(255,255,255,0.8);">• 密码：<code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; font-family: monospace;">test123</code></small>
+              </div>
             `;
           } else {
             resultDiv.innerHTML = `
               <strong>${data.message}</strong><br>
               姓名: <strong>${data.name}</strong><br>
               考试ID: <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px; font-family: monospace;">${data.task_id}</code><br>
-              <small style="color: rgba(255,255,255,0.6);">注册时间: ${new Date(data.registered_at).toLocaleString('zh-CN')}</small>
+              <small style="color: rgba(255,255,255,0.6);">注册时间: ${new Date(data.registered_at).toLocaleString('zh-CN')}</small><br>
+              <div style="background: rgba(52, 152, 219, 0.2); padding: 10px; border-radius: 5px; margin-top: 10px;">
+                <small style="color: rgba(255,255,255,0.8);">💡 Level 3 登录：用户名 <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px;">${data.task_id}</code>，密码 <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px;">test123</code></small>
+              </div>
             `;
           }
         } else {

@@ -165,15 +165,25 @@
     <div class="container">
       <h2>📋 任务说明</h2>
       <div class="task-content">
-        <p><strong>任务</strong>: 登录后爬取你的订单历史</p>
-        <p><strong>账号</strong>: 用户名为你的task_id，密码test123</p>
-        <p><strong>注意</strong>: 需处理CSRF Token，维护Session，检查请求头，过滤假数据</p>
-        <p class="hint">💡 提示: 真实订单价格不会超过$10,000</p>
+        <p><strong>任务</strong>: 登录后爬取你的订单历史数据</p>
+        <p><strong>登录凭证</strong>:</p>
+        <ul style="margin: 10px 0; padding-left: 20px;">
+          <li>用户名：你的考试ID (task_id，在首页注册获得)</li>
+          <li>密码：test123（所有考生统一密码）</li>
+        </ul>
+        <p><strong>挑战要点</strong>:</p>
+        <ol style="margin: 10px 0; padding-left: 20px;">
+          <li>处理 CSRF Token</li>
+          <li>维持登录 Session（Cookie管理）</li>
+          <li>模拟真实浏览器请求头（User-Agent 检测）</li>
+          <li>过滤陷阱数据（价格异常、FAKE_ 前缀等）</li>
+        </ol>
         <p><strong>数据格式</strong>:</p>
         <pre>[
-  {"id": 1, "product_name": "商品名", "quantity": 2, "total_price": 199.98, "status": "Completed"},
+  {"id": 1, "product_name": "Laptop Pro", "quantity": 2, "total_price": 299.99, "status": "Completed"},
   ...
 ]</pre>
+        <p class="hint">💡 提示: 真实订单价格不会超过 $10,000，商品名称不会有 "FAKE_" 前缀</p>
       </div>
     </div>
   </div>
@@ -182,6 +192,18 @@
     <div class="login-header">
       <h1>🔐 安全商城登录</h1>
       <p>登录后查看您的订单历史</p>
+    </div>
+
+    <!-- 登录说明框 -->
+    <div style="background: rgba(241, 196, 15, 0.15); border: 2px solid #f1c40f; padding: 20px; border-radius: 10px; margin-bottom: 25px;">
+      <h3 style="color: #f39c12; margin-bottom: 15px; font-size: 1.1em;">📝 登录说明</h3>
+      <ul style="list-style: none; padding: 0; line-height: 2; margin-bottom: 15px;">
+        <li style="color: rgba(255,255,255,0.9);"><strong style="color: #f1c40f;">用户名：</strong>你在首页注册时获得的考试ID（格式：task_xxxxxx）</li>
+        <li style="color: rgba(255,255,255,0.9);"><strong style="color: #f1c40f;">密码：</strong>test123（所有考生统一密码）</li>
+      </ul>
+      <p style="color: rgba(255,255,255,0.7); font-size: 0.9em; margin: 0;">
+        💡 如果你还没有注册，请先返回 <a href="/" style="color: #3498db; text-decoration: underline;">首页</a> 注册获取考试ID
+      </p>
     </div>
 
     <% if (error) { %>
