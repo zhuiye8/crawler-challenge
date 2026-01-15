@@ -1,6 +1,6 @@
-# 🕷️ Crawler Challenge Platform
+# 🤖 扬州大自然 AI能力应用测试平台
 
-一个用于测试 AI 编码助手（如 Claude Code）爬虫能力的 CTF 风格挑战平台。
+测试考生借助AI工具（Claude Code、Cursor、Copilot等）完成Web爬虫任务的能力评估平台。重点考察AI辅助编程能力，而非单纯的爬虫技能。
 
 ## 快速开始
 
@@ -56,8 +56,10 @@ docker-compose down
 
 ## 测试账号
 
-- **用户名**: team01 - team20
-- **密码**: test123
+考生在首页注册后会获得唯一的考试ID（格式：task_xxxxxx）
+
+- **用户名**: 你的考试ID（例如：task_a1b2c3）
+- **密码**: test123（所有考生统一密码）
 
 ## API 文档
 

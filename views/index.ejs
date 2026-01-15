@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>爬虫挑战赛 - Web Scraping CTF</title>
+  <title>扬州大自然 AI能力应用测试 - Web Scraping Challenge</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -213,11 +213,51 @@
 </head>
 <body>
   <div class="hero">
-    <h1>🕷️ 爬虫挑战赛</h1>
-    <p>测试你的网页爬虫技能！挑战逐级递增的难度关卡，使用 AI 编程助手、逆向分析 API、绑过反爬虫机制！</p>
+    <h1>🤖 扬州大自然 AI能力应用测试</h1>
+    <p>测试你借助AI工具完成编程任务的能力！挑战逐级递增的难度关卡，使用 Claude Code / Cursor / Copilot 等AI助手，逆向分析 API、绕过反爬虫机制！</p>
   </div>
 
   <div class="container">
+    <!-- Registration Section - Moved to Top -->
+    <div class="info-section" style="margin-bottom: 40px;">
+      <h2>📝 考生注册</h2>
+
+      <!-- 重要提示 -->
+      <div style="background: rgba(241, 196, 15, 0.15); border: 2px solid #f1c40f; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px;">
+        <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 0.95em;">
+          ⚠️ <strong style="color: #f39c12;">重要：</strong>Level 3（登录+反爬虫）需要使用你的考试ID登录，请务必先完成注册！
+        </p>
+      </div>
+
+      <!-- Registration Status Display (shown when already registered) -->
+      <div id="registrationStatus" style="display: none;"></div>
+
+      <!-- Registration Form (shown when not registered) -->
+      <div id="registrationForm">
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px; text-align: center;">
+          注册后将获得唯一的考试ID，用于提交答案。<strong style="color: #f1c40f;">完成 Level 3 时，用户名为你的考试ID，密码为 test123</strong>
+        </p>
+        <div style="max-width: 500px; margin: 0 auto;">
+          <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input
+              type="text"
+              id="candidateName"
+              placeholder="请输入你的姓名（2-20个字符）"
+              style="flex: 1; padding: 12px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; font-size: 1em;"
+              maxlength="20"
+            />
+            <button
+              onclick="registerCandidate()"
+              style="padding: 12px 30px; border-radius: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; font-size: 1em; cursor: pointer; white-space: nowrap;"
+            >
+              注册
+            </button>
+          </div>
+          <div id="registrationResult" style="padding: 15px; border-radius: 8px; display: none;"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="levels-grid">
       <a href="/level1" class="level-card">
         <div class="level-header">
@@ -339,47 +379,119 @@
 }</pre>
       </div>
     </div>
-
-    <div class="info-section">
-      <h2>📝 参赛者注册</h2>
-
-      <!-- 重要提示 -->
-      <div style="background: rgba(241, 196, 15, 0.15); border: 2px solid #f1c40f; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
-        <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 0.95em;">
-          ⚠️ <strong style="color: #f39c12;">重要：</strong>Level 3（登录+反爬虫）需要使用你的考试ID登录，请务必先完成注册！
-        </p>
-      </div>
-
-      <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">
-        注册后将获得唯一的考试ID，用于提交答案。<strong style="color: #f1c40f;">完成 Level 3 时，用户名为你的考试ID，密码为 test123</strong>
-      </p>
-      <div style="max-width: 500px; margin: 0 auto;">
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-          <input
-            type="text"
-            id="candidateName"
-            placeholder="请输入你的姓名（2-20个字符）"
-            style="flex: 1; padding: 12px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; font-size: 1em;"
-            maxlength="20"
-          />
-          <button
-            onclick="registerCandidate()"
-            style="padding: 12px 30px; border-radius: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; font-size: 1em; cursor: pointer; white-space: nowrap;"
-          >
-            注册
-          </button>
-        </div>
-        <div id="registrationResult" style="padding: 15px; border-radius: 8px; display: none;"></div>
-      </div>
-    </div>
   </div>
 
   <div class="footer">
-    <p>爬虫挑战赛平台 &copy; 2025</p>
-    <p>专为测试 AI 辅助爬虫能力而设计</p>
+    <p>扬州大自然 AI能力应用测试平台 &copy; 2025</p>
+    <p>测试考生借助AI工具（Claude Code、Cursor、Copilot等）解决实际编程问题的能力</p>
   </div>
 
   <script>
+    // Check localStorage on page load
+    window.addEventListener('load', function() {
+      const savedData = localStorage.getItem('examData');
+      if (savedData) {
+        try {
+          const examData = JSON.parse(savedData);
+          showRegisteredStatus(examData);
+        } catch (e) {
+          console.error('Failed to parse saved exam data:', e);
+          localStorage.removeItem('examData');
+        }
+      }
+    });
+
+    // Show registered status
+    function showRegisteredStatus(data) {
+      const statusDiv = document.getElementById('registrationStatus');
+      const formDiv = document.getElementById('registrationForm');
+
+      statusDiv.style.display = 'block';
+      formDiv.style.display = 'none';
+
+      statusDiv.innerHTML = `
+        <div style="background: rgba(46, 204, 113, 0.2); border: 2px solid rgba(46, 204, 113, 0.5); padding: 25px; border-radius: 10px; max-width: 600px; margin: 0 auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <span style="background: rgba(46, 204, 113, 0.3); color: #2ecc71; padding: 6px 15px; border-radius: 20px; font-weight: 600;">
+              ✓ 已注册
+            </span>
+            <button onclick="clearRegistration()" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.7); padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85em;">
+              重新注册
+            </button>
+          </div>
+
+          <div style="margin-bottom: 20px;">
+            <p style="color: rgba(255,255,255,0.7); margin-bottom: 8px;">姓名</p>
+            <p style="font-size: 1.2em; font-weight: 600;">${data.name}</p>
+          </div>
+
+          <div style="margin-bottom: 20px;">
+            <p style="color: rgba(255,255,255,0.7); margin-bottom: 8px;">考试ID</p>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <code id="taskIdDisplay" style="background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 6px; font-family: monospace; font-size: 1.1em; flex: 1;">${data.taskId}</code>
+              <button onclick="copyTaskId('${data.taskId}')" style="background: rgba(52, 152, 219, 0.3); border: 1px solid rgba(52, 152, 219, 0.5); color: #3498db; padding: 8px 15px; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+                📋 复制
+              </button>
+            </div>
+          </div>
+
+          <div style="background: rgba(52, 152, 219, 0.2); padding: 15px; border-radius: 8px;">
+            <p style="color: rgba(255,255,255,0.9); margin-bottom: 8px;">💡 <strong>Level 3 登录信息</strong></p>
+            <p style="color: rgba(255,255,255,0.8); margin: 5px 0;">• 用户名：<code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px;">${data.taskId}</code></p>
+            <p style="color: rgba(255,255,255,0.8); margin: 5px 0;">• 密码：<code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px;">test123</code></p>
+            <div style="margin-top: 12px;">
+              <a href="/level3/login" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 8px 20px; border-radius: 6px; text-decoration: none; font-size: 0.95em;">
+                前往 Level 3 →
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Copy task ID to clipboard
+    function copyTaskId(taskId) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(taskId).then(() => {
+          alert('✓ 考试ID已复制到剪贴板');
+        }).catch(() => {
+          // Fallback for older browsers
+          fallbackCopy(taskId);
+        });
+      } else {
+        fallbackCopy(taskId);
+      }
+    }
+
+    // Fallback copy method
+    function fallbackCopy(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        alert('✓ 考试ID已复制到剪贴板');
+      } catch (err) {
+        alert('复制失败，请手动复制：' + text);
+      }
+      document.body.removeChild(textArea);
+    }
+
+    // Clear registration data
+    function clearRegistration() {
+      if (confirm('确定要清除当前注册信息并重新注册吗？')) {
+        localStorage.removeItem('examData');
+        document.getElementById('registrationStatus').style.display = 'none';
+        document.getElementById('registrationForm').style.display = 'block';
+        document.getElementById('registrationResult').style.display = 'none';
+        document.getElementById('candidateName').value = '';
+      }
+    }
+
+    // Register candidate
     async function registerCandidate() {
       const nameInput = document.getElementById('candidateName');
       const resultDiv = document.getElementById('registrationResult');
@@ -413,33 +525,17 @@
         const data = await response.json();
 
         if (data.success) {
-          resultDiv.style.display = 'block';
-          resultDiv.style.background = 'rgba(46, 204, 113, 0.2)';
-          resultDiv.style.border = '1px solid rgba(46, 204, 113, 0.5)';
+          // Save to localStorage
+          const examData = {
+            taskId: data.task_id,
+            name: data.name,
+            registeredAt: data.registered_at,
+            isNew: data.is_new
+          };
+          localStorage.setItem('examData', JSON.stringify(examData));
 
-          if (data.is_new) {
-            resultDiv.innerHTML = `
-              <strong>注册成功！</strong><br>
-              姓名: <strong>${data.name}</strong><br>
-              考试ID: <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px; font-family: monospace;">${data.task_id}</code><br>
-              <small style="color: rgba(255,255,255,0.6);">请保存你的考试ID，用于提交答案</small><br>
-              <div style="background: rgba(52, 152, 219, 0.2); padding: 10px; border-radius: 5px; margin-top: 10px;">
-                <small style="color: rgba(255,255,255,0.8);">💡 完成 Level 3 时：</small><br>
-                <small style="color: rgba(255,255,255,0.8);">• 用户名：<code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; font-family: monospace;">${data.task_id}</code></small><br>
-                <small style="color: rgba(255,255,255,0.8);">• 密码：<code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; font-family: monospace;">test123</code></small>
-              </div>
-            `;
-          } else {
-            resultDiv.innerHTML = `
-              <strong>${data.message}</strong><br>
-              姓名: <strong>${data.name}</strong><br>
-              考试ID: <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px; font-family: monospace;">${data.task_id}</code><br>
-              <small style="color: rgba(255,255,255,0.6);">注册时间: ${new Date(data.registered_at).toLocaleString('zh-CN')}</small><br>
-              <div style="background: rgba(52, 152, 219, 0.2); padding: 10px; border-radius: 5px; margin-top: 10px;">
-                <small style="color: rgba(255,255,255,0.8);">💡 Level 3 登录：用户名 <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px;">${data.task_id}</code>，密码 <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px;">test123</code></small>
-              </div>
-            `;
-          }
+          // Show registered status
+          showRegisteredStatus(examData);
         } else {
           resultDiv.style.display = 'block';
           resultDiv.style.background = 'rgba(231, 76, 60, 0.2)';
@@ -456,11 +552,14 @@
 
     // Allow Enter key to submit
     document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('candidateName').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          registerCandidate();
-        }
-      });
+      const nameInput = document.getElementById('candidateName');
+      if (nameInput) {
+        nameInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            registerCandidate();
+          }
+        });
+      }
     });
   </script>
 </body>

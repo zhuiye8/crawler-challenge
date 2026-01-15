@@ -1,7 +1,7 @@
 {
-  "name": "crawler-challenge",
+  "name": "ai-capability-test",
   "version": "1.0.0",
-  "description": "Web Scraping Challenge Platform - 1 Hour CTF",
+  "description": "扬州大自然 AI能力应用测试平台 - Web Scraping Challenge with AI Assistance",
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",

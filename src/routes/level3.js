@@ -37,7 +37,9 @@ const BOT_UA_PATTERNS = [
 ];
 
 function isBotUserAgent(ua) {
-  if (!ua) return true;
+  // More lenient: missing UA is not automatically treated as bot
+  // This allows legitimate crawlers with proper headers to pass
+  if (!ua) return false;
   return BOT_UA_PATTERNS.some(pattern => pattern.test(ua));
 }
 
@@ -93,18 +95,27 @@ router.post('/login', (req, res) => {
     res.cookie('csrf_token', newCsrf, { httpOnly: true, maxAge: 300000 });
     return res.render('level3/login', {
       csrfToken: newCsrf,
-      error: 'Invalid CSRF token. Please try again.'
+      error: 'CSRF令牌无效，请重试'
     });
   }
 
   // Find user
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
-  if (!user || !bcrypt.compareSync(password, user.password_hash)) {
+  if (!user) {
     const newCsrf = generateCsrfToken();
     res.cookie('csrf_token', newCsrf, { httpOnly: true, maxAge: 300000 });
     return res.render('level3/login', {
       csrfToken: newCsrf,
-      error: 'Invalid username or password'
+      error: '用户名不存在。请确保输入的是你的考试ID（格式：task_xxxxxx）<br>如果还没注册，请先<a href="/" style="color: #3498db;">返回首页注册</a>'
+    });
+  }
+
+  if (!bcrypt.compareSync(password, user.password_hash)) {
+    const newCsrf = generateCsrfToken();
+    res.cookie('csrf_token', newCsrf, { httpOnly: true, maxAge: 300000 });
+    return res.render('level3/login', {
+      csrfToken: newCsrf,
+      error: '密码错误。所有考生统一密码为：<code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">test123</code>'
     });
   }
 

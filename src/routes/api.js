@@ -209,13 +209,21 @@ function calculateScore(level, submitted, expected, teamId) {
     return { score: 0, maxScore, details, honeypot_triggered: false };
   }
 
-  // Check for honeypot data
+  // Check for honeypot data (only check specific fields)
   let honeypotTriggered = false;
-  const honeypotPatterns = ['TRAP', 'FAKE_', 'DEBUG', 'SECRET', 'HIDDEN', '999999'];
+  const honeypotNamePatterns = ['TRAP', 'FAKE_', 'DEBUG', 'SECRET', 'HIDDEN', 'TEST_'];
 
   for (const item of submitted) {
-    const itemStr = JSON.stringify(item).toUpperCase();
-    if (honeypotPatterns.some(p => itemStr.includes(p))) {
+    // Check product/item name for honeypot patterns
+    const name = (item.product_name || item.name || '').toUpperCase();
+    if (honeypotNamePatterns.some(p => name.includes(p))) {
+      honeypotTriggered = true;
+      break;
+    }
+
+    // Check for abnormal prices (< 0 or > 10000)
+    const price = item.total_price || item.price || 0;
+    if (price < 0 || price > 10000) {
       honeypotTriggered = true;
       break;
     }
@@ -246,9 +254,36 @@ function calculateScore(level, submitted, expected, teamId) {
     expected.forEach(e => expectedMap.set(e.id, e));
     for (const sub of submitted) {
       const exp = expectedMap.get(sub.id);
-      if (exp && exp.product_name === sub.product_name &&
-          Math.abs(exp.total_price - (sub.total_price || 0)) < 0.01) {
-        matchCount++;
+      if (exp) {
+        let fieldMatches = 0;
+        let totalFields = 4;  // id, product_name, quantity, total_price
+
+        // Product name match (trim and case-insensitive)
+        const expName = (exp.product_name || '').trim().toLowerCase();
+        const subName = (sub.product_name || '').trim().toLowerCase();
+        if (expName === subName) {
+          fieldMatches++;
+        }
+
+        // Quantity match
+        if (exp.quantity === sub.quantity) {
+          fieldMatches++;
+        }
+
+        // Price match (tolerance 0.1 yuan)
+        if (Math.abs(exp.total_price - (sub.total_price || 0)) < 0.1) {
+          fieldMatches++;
+        }
+
+        // Status match (optional field)
+        if (sub.status) {
+          totalFields++;
+          if (exp.status === sub.status) {
+            fieldMatches++;
+          }
+        }
+
+        matchCount += fieldMatches / totalFields;
       }
     }
   } else if (level === 4) {
@@ -292,13 +327,17 @@ router.post('/submit', (req, res) => {
 
   if (!level || !task_id || !data) {
     return res.status(400).json({
-      error: 'Missing required fields',
+      success: false,
+      error: '缺少必要字段',
       required: ['level', 'task_id', 'data']
     });
   }
 
   if (level < 1 || level > 4) {
-    return res.status(400).json({ error: 'Invalid level (1-4)' });
+    return res.status(400).json({
+      success: false,
+      error: '无效的关卡级别（必须为1-4）'
+    });
   }
 
   // Check submission count
@@ -309,8 +348,10 @@ router.post('/submit', (req, res) => {
 
   if (submissionCount.count >= 5) {
     return res.status(429).json({
-      error: 'Maximum submissions reached (5 per level)',
-      submissions_used: submissionCount.count
+      success: false,
+      error: '已达到最大提交次数（每关5次）',
+      submissions_used: submissionCount.count,
+      tip: '请仔细检查数据格式和内容后再提交'
     });
   }
 
@@ -384,19 +425,19 @@ router.get('/trap/:type', (req, res) => {
     VALUES (?, ?, ?)
   `).run(req.query.task_id || 'unknown', ip, `trap_link_${req.params.type}`);
 
-  res.status(403).json({ error: 'Honeypot triggered. This has been logged.' });
+  res.status(403).json({ error: '蜜罐陷阱已触发，此行为已被记录' });
 });
 
 // Admin: Get expected answers (protected)
 router.get('/answers/:level', (req, res) => {
   const adminKey = req.query.admin_key;
   if (adminKey !== 'super_secret_admin_2025') {
-    return res.status(403).json({ error: 'Unauthorized' });
+    return res.status(403).json({ error: '未授权访问' });
   }
 
   const level = parseInt(req.params.level);
   if (level < 1 || level > 4) {
-    return res.status(400).json({ error: 'Invalid level' });
+    return res.status(400).json({ error: '无效的关卡级别' });
   }
 
   const answers = EXPECTED_ANSWERS[level](req.query.user_id);

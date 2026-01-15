@@ -239,5 +239,39 @@
 
     <a href="/" class="back-btn">← 返回首页</a>
   </div>
+
+  <script>
+    // Auto-fill username from localStorage
+    window.addEventListener('load', function() {
+      const savedData = localStorage.getItem('examData');
+      if (savedData) {
+        try {
+          const examData = JSON.parse(savedData);
+          const usernameInput = document.getElementById('username');
+
+          if (usernameInput && examData.taskId) {
+            usernameInput.value = examData.taskId;
+
+            // Show auto-fill confirmation
+            const confirmMsg = document.createElement('p');
+            confirmMsg.className = 'auto-fill-hint';
+            confirmMsg.style.cssText = 'color: #2ecc71; font-size: 0.9em; margin-top: 8px; margin-bottom: 0;';
+            confirmMsg.innerHTML = '✓ 已自动填充你的考试ID';
+
+            const usernameGroup = usernameInput.parentElement;
+            usernameGroup.appendChild(confirmMsg);
+
+            // Focus on password field for convenience
+            const passwordInput = document.getElementById('password');
+            if (passwordInput) {
+              passwordInput.focus();
+            }
+          }
+        } catch (e) {
+          console.error('Failed to parse saved exam data:', e);
+        }
+      }
+    });
+  </script>
 </body>
 </html>
