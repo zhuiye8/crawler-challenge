@@ -129,10 +129,17 @@ router.post('/register', (req, res) => {
 
         insertOrder.run(user.id, productName, quantity, totalPrice, status, orderDate, 1);
       }
+    } else {
+      throw new Error('Failed to create user record');
     }
   } catch (e) {
     console.error('Error creating user account:', e);
-    // Continue even if user creation fails (for backward compatibility)
+    // Clean up: rollback tasks table insert
+    db.prepare('DELETE FROM tasks WHERE task_id = ?').run(task_id);
+    return res.status(500).json({
+      success: false,
+      error: '创建用户账号失败: ' + e.message
+    });
   }
 
   // Get the registered record

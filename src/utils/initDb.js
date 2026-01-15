@@ -30,7 +30,7 @@ db.exec(`
 
   -- Products table for Level 1, 2
   CREATE TABLE IF NOT EXISTS products (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     price REAL NOT NULL,
     stock INTEGER NOT NULL,
@@ -42,7 +42,7 @@ db.exec(`
 
   -- Users table for Level 3
   CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     team_name TEXT NOT NULL,
@@ -51,7 +51,7 @@ db.exec(`
 
   -- Orders table for Level 3
   CREATE TABLE IF NOT EXISTS orders (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     product_name TEXT NOT NULL,
     quantity INTEGER NOT NULL,
@@ -64,7 +64,7 @@ db.exec(`
 
   -- VIP Products for Level 4
   CREATE TABLE IF NOT EXISTS vip_products (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     original_price REAL NOT NULL,
     sale_price REAL NOT NULL,
@@ -76,7 +76,7 @@ db.exec(`
 
   -- Submissions tracking
   CREATE TABLE IF NOT EXISTS submissions (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     task_id TEXT NOT NULL,
     level INTEGER NOT NULL,
     score INTEGER NOT NULL,
@@ -87,7 +87,7 @@ db.exec(`
 
   -- Honeypot triggers
   CREATE TABLE IF NOT EXISTS honeypot_logs (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     task_id TEXT,
     ip_address TEXT,
     trap_type TEXT NOT NULL,
