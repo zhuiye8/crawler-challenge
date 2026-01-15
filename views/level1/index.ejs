@@ -92,6 +92,45 @@
       color: #7f8c8d;
       font-size: 0.9em;
     }
+
+    .task-description {
+      background: rgba(102, 126, 234, 0.1);
+      border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+      padding: 20px 0;
+      margin-bottom: 20px;
+    }
+    .task-description h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+    .task-description .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .task-content {
+      background: rgba(0,0,0,0.2);
+      padding: 20px;
+      border-radius: 10px;
+      line-height: 1.6;
+    }
+    .task-content strong {
+      color: #f5af19;
+    }
+    .task-content pre {
+      background: rgba(0,0,0,0.4);
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin: 10px 0;
+      font-size: 0.9em;
+      color: #e0e0e0;
+    }
+    .task-content .hint {
+      color: #2ecc71;
+      font-style: italic;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -103,6 +142,21 @@
     </div>
     <br>
     <a href="/" class="back-btn">← 返回首页</a>
+  </div>
+
+  <div class="task-description">
+    <div class="container">
+      <h2>📋 任务说明</h2>
+      <div class="task-content">
+        <p><strong>任务</strong>: 爬取页面上的所有商品数据</p>
+        <p><strong>数据格式</strong>:</p>
+        <pre>[
+  {"id": 1, "name": "商品名", "price": 99.99, "stock": 50, "sku": "ABC123", "category": "Electronics"},
+  ...
+]</pre>
+        <p class="hint">💡 提示: 不是所有你能在HTML中看到的数据都应该被爬取...</p>
+      </div>
+    </div>
   </div>
 
   <table id="product-table">

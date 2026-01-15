@@ -115,9 +115,9 @@ router.get('/api/all-prices', (req, res) => {
   // Log honeypot trigger
   const ip = req.ip || req.connection.remoteAddress;
   db.prepare(`
-    INSERT INTO honeypot_logs (team_id, ip_address, trap_type)
+    INSERT INTO honeypot_logs (task_id, ip_address, trap_type)
     VALUES (?, ?, ?)
-  `).run(req.query.team_id || 'unknown', ip, 'level2_all_prices_api');
+  `).run(req.query.task_id || 'unknown', ip, 'level2_all_prices_api');
 
   // Return fake data
   res.json({

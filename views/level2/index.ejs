@@ -133,6 +133,45 @@
       left: -9999px;
       opacity: 0;
     }
+
+    .task-description {
+      background: rgba(102, 126, 234, 0.1);
+      border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+      padding: 20px 0;
+      margin-bottom: 20px;
+    }
+    .task-description h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+    .task-description .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .task-content {
+      background: rgba(0,0,0,0.2);
+      padding: 20px;
+      border-radius: 10px;
+      line-height: 1.6;
+    }
+    .task-content strong {
+      color: #f5af19;
+    }
+    .task-content pre {
+      background: rgba(0,0,0,0.4);
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin: 10px 0;
+      font-size: 0.9em;
+      color: #e0e0e0;
+    }
+    .task-content .hint {
+      color: #2ecc71;
+      font-style: italic;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -140,6 +179,17 @@
     <h1>⚡ 科技商城 - 动态加载</h1>
     <p>第 <%= currentPage %> 页，共 <%= totalPages %> 页 | 每页 <%= itemsPerPage %> 件商品</p>
     <a href="/" class="back-btn">← 返回首页</a>
+  </div>
+
+  <div class="task-description">
+    <div class="container">
+      <h2>📋 任务说明</h2>
+      <div class="task-content">
+        <p><strong>任务</strong>: 爬取分布在 10 个分页上的商品数据（含价格）</p>
+        <p><strong>注意</strong>: 价格通过AJAX加载，API有频率限制(10次/秒)，商品ID在data-id属性中</p>
+        <p><strong>数据格式</strong>: 同Level 1</p>
+      </div>
+    </div>
   </div>
 
   <div class="product-grid">

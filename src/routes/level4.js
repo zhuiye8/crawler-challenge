@@ -192,9 +192,9 @@ router.post('/api/fingerprint', (req, res) => {
   // Log if bot detected
   if (totalScore > 40) {
     db.prepare(`
-      INSERT INTO honeypot_logs (team_id, ip_address, trap_type)
+      INSERT INTO honeypot_logs (task_id, ip_address, trap_type)
       VALUES (?, ?, ?)
-    `).run(req.query.team_id || 'unknown', req.ip, 'level4_bot_fingerprint');
+    `).run(req.query.task_id || 'unknown', req.ip, 'level4_bot_fingerprint');
   }
 
   res.json({

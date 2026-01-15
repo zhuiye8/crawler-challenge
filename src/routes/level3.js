@@ -162,7 +162,7 @@ router.get('/orders', requireAuth, (req, res) => {
 
     // Log this suspicious request
     db.prepare(`
-      INSERT INTO honeypot_logs (team_id, ip_address, trap_type)
+      INSERT INTO honeypot_logs (task_id, ip_address, trap_type)
       VALUES (?, ?, ?)
     `).run(req.user.username, req.ip, 'level3_bot_ua_detected');
   } else {
@@ -201,7 +201,7 @@ router.get('/api/orders', requireAuth, (req, res) => {
 
     // Log
     db.prepare(`
-      INSERT INTO honeypot_logs (team_id, ip_address, trap_type)
+      INSERT INTO honeypot_logs (task_id, ip_address, trap_type)
       VALUES (?, ?, ?)
     `).run(req.user.username, req.ip, 'level3_api_bot_detected');
   } else {

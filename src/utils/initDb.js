@@ -19,6 +19,15 @@ console.log('Initializing database...');
 
 // Create tables
 db.exec(`
+  -- Tasks table for candidate registration
+  CREATE TABLE IF NOT EXISTS tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    task_id TEXT UNIQUE NOT NULL,
+    name TEXT UNIQUE NOT NULL,
+    registered_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
   -- Products table for Level 1, 2
   CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY,
@@ -68,7 +77,7 @@ db.exec(`
   -- Submissions tracking
   CREATE TABLE IF NOT EXISTS submissions (
     id INTEGER PRIMARY KEY,
-    team_id TEXT NOT NULL,
+    task_id TEXT NOT NULL,
     level INTEGER NOT NULL,
     score INTEGER NOT NULL,
     max_score INTEGER NOT NULL,
@@ -79,7 +88,7 @@ db.exec(`
   -- Honeypot triggers
   CREATE TABLE IF NOT EXISTS honeypot_logs (
     id INTEGER PRIMARY KEY,
-    team_id TEXT,
+    task_id TEXT,
     ip_address TEXT,
     trap_type TEXT NOT NULL,
     triggered_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -93,6 +102,11 @@ db.exec(`
     expires_at DATETIME NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
   );
+
+  -- Indexes for performance
+  CREATE INDEX IF NOT EXISTS idx_task_level ON submissions(task_id, level);
+  CREATE INDEX IF NOT EXISTS idx_task_submitted ON submissions(task_id, submitted_at);
+  CREATE INDEX IF NOT EXISTS idx_task_name ON tasks(name);
 `);
 
 console.log('Tables created successfully!');

@@ -1,14 +1,98 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../utils/db');
+const crypto = require('crypto');
 
 /**
  * Submission and Scoring API
  *
+ * POST /api/register - Register a candidate and get task_id
  * POST /api/submit - Submit scraped data for scoring
  * GET /api/leaderboard - Get current leaderboard
  * GET /api/answers/:level - Get expected answers (admin only)
  */
+
+// Helper function to generate unique task_id
+function generateTaskId() {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let result = 'task_';
+  for (let i = 0; i < 6; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+// Register endpoint
+router.post('/register', (req, res) => {
+  const { name } = req.body;
+
+  if (!name) {
+    return res.status(400).json({
+      success: false,
+      error: '请提供姓名'
+    });
+  }
+
+  // Validate name length
+  if (name.length < 2 || name.length > 20) {
+    return res.status(400).json({
+      success: false,
+      error: '姓名长度必须在2-20个字符之间'
+    });
+  }
+
+  // Check if name already exists
+  const existing = db.prepare('SELECT task_id, name, registered_at FROM tasks WHERE name = ?').get(name);
+
+  if (existing) {
+    return res.json({
+      success: true,
+      task_id: existing.task_id,
+      name: existing.name,
+      registered_at: existing.registered_at,
+      is_new: false,
+      message: '欢迎回来！你已经注册过了'
+    });
+  }
+
+  // Generate unique task_id with retry
+  let task_id;
+  let attempts = 0;
+  const maxAttempts = 10;
+
+  while (attempts < maxAttempts) {
+    task_id = generateTaskId();
+    try {
+      const stmt = db.prepare('INSERT INTO tasks (task_id, name) VALUES (?, ?)');
+      stmt.run(task_id, name);
+      break;
+    } catch (e) {
+      if (e.code === 'SQLITE_CONSTRAINT') {
+        attempts++;
+        continue;
+      }
+      throw e;
+    }
+  }
+
+  if (attempts >= maxAttempts) {
+    return res.status(500).json({
+      success: false,
+      error: '生成唯一ID失败，请重试'
+    });
+  }
+
+  // Get the registered record
+  const registered = db.prepare('SELECT task_id, name, registered_at FROM tasks WHERE task_id = ?').get(task_id);
+
+  res.json({
+    success: true,
+    task_id: registered.task_id,
+    name: registered.name,
+    registered_at: registered.registered_at,
+    is_new: true
+  });
+});
 
 // Expected answers for each level
 const EXPECTED_ANSWERS = {
@@ -144,12 +228,12 @@ function calculateScore(level, submitted, expected, teamId) {
 
 // Submit endpoint
 router.post('/submit', (req, res) => {
-  const { level, team_id, data } = req.body;
+  const { level, task_id, data } = req.body;
 
-  if (!level || !team_id || !data) {
+  if (!level || !task_id || !data) {
     return res.status(400).json({
       error: 'Missing required fields',
-      required: ['level', 'team_id', 'data']
+      required: ['level', 'task_id', 'data']
     });
   }
 
@@ -160,8 +244,8 @@ router.post('/submit', (req, res) => {
   // Check submission count
   const submissionCount = db.prepare(`
     SELECT COUNT(*) as count FROM submissions
-    WHERE team_id = ? AND level = ?
-  `).get(team_id, level);
+    WHERE task_id = ? AND level = ?
+  `).get(task_id, level);
 
   if (submissionCount.count >= 5) {
     return res.status(429).json({
@@ -173,7 +257,7 @@ router.post('/submit', (req, res) => {
   // Get user ID for level 3
   let userId = null;
   if (level === 3) {
-    const user = db.prepare('SELECT id FROM users WHERE username = ?').get(team_id);
+    const user = db.prepare('SELECT id FROM users WHERE username = ?').get(task_id);
     if (user) userId = user.id;
   }
 
@@ -181,19 +265,19 @@ router.post('/submit', (req, res) => {
   const expected = level === 3 ? EXPECTED_ANSWERS[level](userId) : EXPECTED_ANSWERS[level]();
 
   // Calculate score
-  const result = calculateScore(level, data, expected, team_id);
+  const result = calculateScore(level, data, expected, task_id);
 
   // Save submission
   db.prepare(`
-    INSERT INTO submissions (team_id, level, score, max_score, details)
+    INSERT INTO submissions (task_id, level, score, max_score, details)
     VALUES (?, ?, ?, ?, ?)
-  `).run(team_id, level, result.score, result.maxScore, JSON.stringify(result.details));
+  `).run(task_id, level, result.score, result.maxScore, JSON.stringify(result.details));
 
   // Emit to scoreboard
   const io = req.app.get('io');
   if (io) {
     io.emit('submission', {
-      team_id,
+      task_id,
       level,
       score: result.score,
       timestamp: Date.now()
@@ -215,16 +299,16 @@ router.post('/submit', (req, res) => {
 router.get('/leaderboard', (req, res) => {
   const leaderboard = db.prepare(`
     SELECT
-      team_id,
+      task_id,
       SUM(score) as total_score,
       COUNT(DISTINCT level) as levels_completed,
       MAX(submitted_at) as last_submission
     FROM (
-      SELECT team_id, level, MAX(score) as score, MAX(submitted_at) as submitted_at
+      SELECT task_id, level, MAX(score) as score, MAX(submitted_at) as submitted_at
       FROM submissions
-      GROUP BY team_id, level
+      GROUP BY task_id, level
     )
-    GROUP BY team_id
+    GROUP BY task_id
     ORDER BY total_score DESC, last_submission ASC
     LIMIT 50
   `).all();
@@ -236,9 +320,9 @@ router.get('/leaderboard', (req, res) => {
 router.get('/trap/:type', (req, res) => {
   const ip = req.ip || req.connection.remoteAddress;
   db.prepare(`
-    INSERT INTO honeypot_logs (team_id, ip_address, trap_type)
+    INSERT INTO honeypot_logs (task_id, ip_address, trap_type)
     VALUES (?, ?, ?)
-  `).run(req.query.team_id || 'unknown', ip, `trap_link_${req.params.type}`);
+  `).run(req.query.task_id || 'unknown', ip, `trap_link_${req.params.type}`);
 
   res.status(403).json({ error: 'Honeypot triggered. This has been logged.' });
 });

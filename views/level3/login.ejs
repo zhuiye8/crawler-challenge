@@ -119,9 +119,65 @@
       /* 此字段包含 CSRF 令牌 */
       /* 爬虫需要提取此值 */
     }
+
+    .task-description {
+      background: rgba(102, 126, 234, 0.1);
+      border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+      padding: 20px 0;
+      margin-bottom: 20px;
+    }
+    .task-description h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+    .task-description .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .task-content {
+      background: rgba(0,0,0,0.2);
+      padding: 20px;
+      border-radius: 10px;
+      line-height: 1.6;
+    }
+    .task-content strong {
+      color: #f5af19;
+    }
+    .task-content pre {
+      background: rgba(0,0,0,0.4);
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin: 10px 0;
+      font-size: 0.9em;
+      color: #e0e0e0;
+    }
+    .task-content .hint {
+      color: #2ecc71;
+      font-style: italic;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
+  <div class="task-description">
+    <div class="container">
+      <h2>📋 任务说明</h2>
+      <div class="task-content">
+        <p><strong>任务</strong>: 登录后爬取你的订单历史</p>
+        <p><strong>账号</strong>: 用户名为你的task_id，密码test123</p>
+        <p><strong>注意</strong>: 需处理CSRF Token，维护Session，检查请求头，过滤假数据</p>
+        <p class="hint">💡 提示: 真实订单价格不会超过$10,000</p>
+        <p><strong>数据格式</strong>:</p>
+        <pre>[
+  {"id": 1, "product_name": "商品名", "quantity": 2, "total_price": 199.98, "status": "Completed"},
+  ...
+]</pre>
+      </div>
+    </div>
+  </div>
+
   <div class="login-container">
     <div class="login-header">
       <h1>🔐 安全商城登录</h1>
